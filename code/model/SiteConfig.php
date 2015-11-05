@@ -82,30 +82,50 @@ class SiteConfig extends DataObject implements PermissionProvider, TemplateGloba
 		$fields = new FieldList(
 			new TabSet("Root",
 				$tabMain = new Tab('Main',
-					$titleField = new TextField("Title", _t('SiteConfig.SITETITLE', "Site title")),
-					$taglineField = new TextField("Tagline", _t('SiteConfig.SITETAGLINE', "Site Tagline/Slogan")),
-					$themeDropdownField = new DropdownField("Theme", _t('SiteConfig.THEME', 'Theme'), $this->getAvailableThemes())
+					$titleField = TextField::create("Title", _t('SiteConfig.SITETITLE', "Site title")),
+					$taglineField = TextField::create("Tagline", _t('SiteConfig.SITETAGLINE', "Site Tagline/Slogan")),
+					$themeDropdownField = SelectField::create(
+						"Theme",
+						_t('SiteConfig.THEME', 'Theme'),
+						$this->getAvailableThemes()
+					)
+						->setEmptyString(_t('SiteConfig.DEFAULTTHEME', '(Use default theme)'))
 				),
 				$tabAccess = new Tab('Access',
-					$viewersOptionsField = new OptionsetField("CanViewType", _t('SiteConfig.VIEWHEADER', "Who can view pages on this site?")),
-					$viewerGroupsField = ListboxField::create("ViewerGroups", _t('SiteTree.VIEWERGROUPS', "Viewer Groups"))
-						->setMultiple(true)
+					$viewersOptionsField = RadioField::create(
+						"CanViewType",
+						_t('SiteConfig.VIEWHEADER', "Who can view pages on this site?")
+					),
+					$viewerGroupsField = MultiSelectField::create(
+						"ViewerGroups",
+						_t('SiteTree.VIEWERGROUPS', "Viewer Groups")
+					)
 						->setSource($groupsMap)
 						->setAttribute(
 							'data-placeholder', 
 							_t('SiteTree.GroupPlaceholder', 'Click to select group')
 						),
-					$editorsOptionsField = new OptionsetField("CanEditType", _t('SiteConfig.EDITHEADER', "Who can edit pages on this site?")),
-					$editorGroupsField = ListboxField::create("EditorGroups", _t('SiteTree.EDITORGROUPS', "Editor Groups"))
-						->setMultiple(true)
+					$editorsOptionsField = RadioField::create(
+						"CanEditType",
+						_t('SiteConfig.EDITHEADER', "Who can edit pages on this site?")
+					),
+					$editorGroupsField = MultiSelectField::create(
+						"EditorGroups",
+						_t('SiteTree.EDITORGROUPS', "Editor Groups")
+					)
 						->setSource($groupsMap)
 						->setAttribute(
 							'data-placeholder', 
 							_t('SiteTree.GroupPlaceholder', 'Click to select group')
 						),
-					$topLevelCreatorsOptionsField = new OptionsetField("CanCreateTopLevelType", _t('SiteConfig.TOPLEVELCREATE', "Who can create pages in the root of the site?")),
-					$topLevelCreatorsGroupsField = ListboxField::create("CreateTopLevelGroups", _t('SiteTree.TOPLEVELCREATORGROUPS', "Top level creators"))
-						->setMultiple(true)
+					$topLevelCreatorsOptionsField = RadioField::create(
+						"CanCreateTopLevelType",
+						_t('SiteConfig.TOPLEVELCREATE', "Who can create pages in the root of the site?")
+					),
+					$topLevelCreatorsGroupsField = MultiSelectField::create(
+						"CreateTopLevelGroups",
+						_t('SiteTree.TOPLEVELCREATORGROUPS', "Top level creators")
+					)
 						->setSource($groupsMap)
 						->setAttribute(
 							'data-placeholder', 
@@ -115,8 +135,6 @@ class SiteConfig extends DataObject implements PermissionProvider, TemplateGloba
 			),
 			new HiddenField('ID')
 		);
-
-		$themeDropdownField->setEmptyString(_t('SiteConfig.DEFAULTTHEME', '(Use default theme)'));
 
 		$viewersOptionsSource = array();
 		$viewersOptionsSource["Anyone"] = _t('SiteTree.ACCESSANYONE', "Anyone");
@@ -140,6 +158,7 @@ class SiteConfig extends DataObject implements PermissionProvider, TemplateGloba
 			$fields->makeFieldReadonly($topLevelCreatorsGroupsField);
 			$fields->makeFieldReadonly($taglineField);
 			$fields->makeFieldReadonly($titleField);
+			$fields->makeFieldReadonly($themeDropdownField);
 		}
 
 		if(file_exists(BASE_PATH . '/install.php')) {
